@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline COO Challenge</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <header class="container">
+            <hgroup>
+                <h1>Airline COO Challenge</h1>
+                <h2>Maximize Your Revenue, Test Your Bias</h2>
+            </hgroup>
+        </header>
+        <section>
+            <div class="grid">
+                <!-- Host a Game Card -->
+                <article>
+                    <header><strong>Host a New Game</strong></header>
+                    <form action="/host" method="post">
+                        <label for="host_player_name">Your Name</label>
+                        <input type="text" id="host_player_name" name="player_name" placeholder="Enter your name" required>
+                        <button type="submit">Host Game</button>
+                    </form>
+                </article>
+
+                <!-- Join a Game Card -->
+                <article>
+                    <header><strong>Join an Existing Game</strong></header>
+                    <form action="/join" method="post">
+                        <label for="room_id">Room ID</label>
+                        <input type="text" id="room_id" name="room_id" placeholder="Enter Room ID" required>
+                        
+                        <label for="join_player_name">Your Name</label>
+                        <input type="text" id="join_player_name" name="player_name" placeholder="Enter your name" required>
+                        
+                        <button type="submit">Join Game</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

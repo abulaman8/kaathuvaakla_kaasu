@@ -1,0 +1,5 @@
+<ul>
+{% for p in players %}
+    <li>{{ p.name }} {% if p.player_id == current_player_id %} (You){% endif %}</li>
+{% endfor %}
+</ul>

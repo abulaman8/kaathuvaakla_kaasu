@@ -1,0 +1,77 @@
+<article id="game-content">
+    <header>
+        <h2>Game Over!</h2>
+        <p>Here are the final results.</p>
+    </header>
+    
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Player</th>
+                    <th scope="col">Final Revenue</th>
+                    <th scope="col">Penalties</th>
+                    <th scope="col"><strong>Total Score</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players | sort(attribute='total_score', reverse=true) %}
+                <tr>
+                    <th scope="row">{{ loop.index }}</th>
+                    <td><strong>{{ player.name }}</strong> {% if player.player_id == current_player_id %} (You){% endif %}</td>
+                    <td>₹{{ player.final_revenue }}</td>
+                    <td>- ₹{{ player.overbooking_penalty + player.underbooking_penalty }}</td>
+                    <td><strong>₹{{ player.total_score }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </figure>
+    <details>
+        <summary role="button" class="outline">View Detailed Player History</summary>
+        {% for player in players | sort(attribute='total_score', reverse=true) %}
+        <article>
+            <header><strong>{{ player.name }}'s Choices</strong></header>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th>Round</th>
+                        <th>Group</th>
+                        <th>Price</th>
+                        <th>Your Decision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in game_room.bookings %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ booking.volume }} {{ booking.anchor_value }}s</td>
+                        <td>₹{{ booking.price_per_seat }}</td>
+                        <td>
+                            {% if player.choice_history.get(booking.booking_id) == "Accepted" %}
+                            <strong style="color: var(--pico-color-green-500);">Accepted</strong>
+                            {% else %}
+                            <span style="color: var(--pico-color-red-500);">Rejected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </article>
+        {% endfor %}
+    </details>
+    
+    <footer>
+        {% if is_host %}
+        <form action="/host" method="post">
+            <!-- Pass the host's name to the new game -->
+            <input type="hidden" name="player_name" value="{{ host_name }}">
+            <button type="submit">Host a New Game</button>
+        </form>
+        {% else %}
+        <p>Waiting for the host to start a new game.</p>
+        {% endif %}
+    </footer>
+</article>

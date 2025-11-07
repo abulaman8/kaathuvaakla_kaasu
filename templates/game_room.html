@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Room: {{ room.room_id }} | Airline COO Challenge</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    
+    <script src="https://unpkg.com/htmx.org@1.9.9" integrity="sha384-QFjmbokDn2DjBjq+fM+8LUIVrAgqcNW2s0PjAxHETgRn9l4fvX31ZxDxvwQnyMOX" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/ws.js"></script>
+</head>
+<body>
+    <main class="container" hx-ext="ws" ws-connect="/ws/{{ room.room_id }}/{{ player.player_id }}" hx-target="#game-area">
+        
+        <header class="container">
+            <hgroup>
+                <h1>Game Room: <code>{{ room.room_id }}</code></h1>
+                <h3>Your Name: <strong>{{ player.name }}</strong></h3>
+            </hgroup>
+        </header>
+
+        <section id="game-area">
+            {% if room.game_status == 'WAITING' %}
+            <article id="game-content">
+                <header>
+                    <h2>Waiting Lobby</h2>
+                </header>
+                <p>Share the Room ID with other players to let them join.</p>
+                
+                <h3>Players in Lobby (<span id="player-count">{{ room.players | length }}</span>):</h3>
+                
+                <div id="player-list">
+                    <ul>
+                    {% for p in room.players.values() %}
+                        <li>{{ p.name }} {% if p.player_id == player.player_id %} (You){% endif %}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+                
+                <footer>
+                    {% if player.player_id == room.players|first %}
+                    <button hx-trigger="click" ws-send hx-vals='{"action": "start_game"}'>Start Game</button>
+                    {% else %}
+                    <progress></progress>
+                    <p>Waiting for the host to start the game...</p>
+                    {% endif %}
+                </footer>
+            </article>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- NEW: The HTMX-aware timer script -->
+    <script>
+        // This will hold our timer interval so we can clear it between rounds
+        let timerInterval = null;
+
+        // Listen for the htmx:afterSwap event, which fires after new content is loaded
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
+            
+            // Clear any old timer that might be running from a previous round
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            // Find the new timer display element that HTMX just swapped in
+            const newTimerElement = document.getElementById('timer-display');
+            
+            // If the new content has a timer, start the countdown
+            if (newTimerElement) {
+                let timeLeft = 60;
+
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    newTimerElement.textContent = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        // The backend handles moving to the next round,
+                        // so we just stop the frontend timer.
+                    }
+                }, 1000);
+            }
+        });
+    </script>
+
+</body>
+</html>

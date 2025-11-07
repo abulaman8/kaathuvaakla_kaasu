@@ -1,0 +1,49 @@
+<article id="game-content">
+    <header>
+        <div class="grid">
+            <div>
+                <hgroup>
+                    <h2>Round {{ room.current_round + 1 }} of {{ room.bookings | length }}</h2>
+                    <h3>A new booking request has arrived!</h3>
+                </hgroup>
+            </div>
+            <div style="text-align: right;">
+                <strong>Time Remaining:</strong>
+                <p><strong id="timer-display">60</strong> seconds</p>
+            </div>
+        </div>
+    </header>
+
+    <p>A group of <strong>{{ booking.volume }} {{ booking.anchor_value }}s</strong> is requesting to book tickets.</p>
+    <div class="grid">
+        <figure>
+            <figcaption><strong>Price per Ticket</strong></figcaption>
+            <h4 style="margin: 0;">₹{{ booking.price_per_seat }}</h4>
+        </figure>
+        <figure>
+            <figcaption><strong>Potential Revenue</strong></figcaption>
+            <h4 style="margin: 0;">₹{{ booking.volume * booking.price_per_seat }}</h4>
+        </figure>
+    </div>
+    <hr>
+    <h4>Detailed Demographics</h4>
+    {% for category, breakdown in booking.demographic_splits.items() %}
+      {% if category != booking.anchor_type %}
+        <details>
+            <summary role="button" class="secondary outline">{{ category }} Breakdown</summary>
+            <ul>
+                {% for value, count in breakdown.items() %}
+                <li>{{ value }}: <strong>{{ count }}</strong></li>
+                {% endfor %}
+            </ul>
+        </details>
+      {% endif %}
+    {% endfor %}
+
+    <footer id="player-action-area">
+        <div class="grid">
+            <button hx-trigger="click" ws-send hx-vals='{"action": "accept_booking"}' class="secondary">Accept Booking</button>
+            <button hx-trigger="click" ws-send hx-vals='{"action": "reject_booking"}' class="contrast">Reject Booking</button>
+        </div>
+    </footer>
+</article>

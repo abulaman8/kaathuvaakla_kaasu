@@ -1,0 +1,10 @@
+<span id="player-count" hx-swap-oob="true">{{ players | length }}</span>
+
+<!-- This snippet updates the player list -->
+<div id="player-list" hx-swap-oob="true">
+    <ul>
+    {% for p in players %}
+        <li>{{ p.name }} {% if p.player_id == current_player_id %} (You){% endif %}</li>
+    {% endfor %}
+    </ul>
+</div>
