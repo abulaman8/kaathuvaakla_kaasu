@@ -3,7 +3,7 @@
         <h2>Game Over!</h2>
         <p>Here are the final results.</p>
     </header>
-    
+
     <figure>
         <table role="grid">
             <thead>
@@ -28,26 +28,36 @@
             </tbody>
         </table>
     </figure>
+
+    <!-- Accordion for Detailed Breakdown -->
     <details>
         <summary role="button" class="outline">View Detailed Player History</summary>
-        {% for player in players | sort(attribute='total_score', reverse=true) %}
+        {% for player in players | sort(attribute='name') %}
         <article>
             <header><strong>{{ player.name }}'s Choices</strong></header>
             <table role="grid">
                 <thead>
                     <tr>
-                        <th>Round</th>
                         <th>Group</th>
                         <th>Price</th>
+                        <th>Booked</th>
+                        <th>Showed Up</th>
                         <th>Your Decision</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for booking in game_room.bookings %}
                     <tr>
-                        <td>{{ loop.index }}</td>
                         <td>{{ booking.volume }} {{ booking.anchor_value }}s</td>
                         <td>₹{{ booking.price_per_seat }}</td>
+                        <td>{{ booking.volume }}</td>
+                        <td>
+                            {% if player.show_up_history.get(booking.booking_id) is not none %}
+                                {{ player.show_up_history.get(booking.booking_id) }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                         <td>
                             {% if player.choice_history.get(booking.booking_id) == "Accepted" %}
                             <strong style="color: var(--pico-color-green-500);">Accepted</strong>
@@ -62,7 +72,7 @@
         </article>
         {% endfor %}
     </details>
-    
+
     <footer>
         {% if is_host %}
         <form action="/host" method="post">
@@ -72,6 +82,7 @@
         </form>
         {% else %}
         <p>Waiting for the host to start a new game.</p>
+        <a href="/" role="button" class="secondary">Return to Home</a>
         {% endif %}
     </footer>
 </article>

@@ -44,6 +44,7 @@ class Player(BaseModel):
     underbooking_penalty: int = 0
     total_score: int = 0
     choice_history: Dict[int, str] = Field(default_factory=dict)
+    show_up_history: Dict[int, int] = Field(default_factory=dict)
 
 class GameRoom(BaseModel):
     """The main state container for a single game instance."""
@@ -95,13 +96,21 @@ class GameRoom(BaseModel):
             self.calculate_final_score(player)
 
     def calculate_final_score(self, player: Player):
+        """Calculates the total revenue and penalties for a single player."""
         total_showed_up = 0
         total_revenue = 0
+        
         for booking in player.accepted_bookings:
+            passengers_showed_up = 0
             for passenger in booking.passengers:
                 if random.random() > CANCELLATION_PROBABILITY:
-                    total_showed_up += 1
-                    total_revenue += booking.price_per_seat
+                    passengers_showed_up += 1
+            
+            # Store the result for this booking
+            player.show_up_history[booking.booking_id] = passengers_showed_up
+            
+            total_showed_up += passengers_showed_up
+            total_revenue += passengers_showed_up * booking.price_per_seat
         
         player.final_revenue = total_revenue
 
